@@ -1,1 +1,1250 @@
-1
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>微博 - 分享新鲜事</title>
+  <style>
+    :root{
+      --bg-color:#f7f8fa;
+      --panel-bg:#fff;
+      --border-color:#e5e7eb;
+      --text-color:#1a1a1a;
+      --muted-text-color:#8c8c8c;
+      --primary-color:#ff8200;
+      --secondary-color:#f5f5f5;
+      --shadow-light:0 2px 8px rgba(0,0,0,.05);
+      --border-radius-lg:12px;
+      --border-radius-md:8px;
+      --border-radius-sm:4px;
+
+      --badge-neutral-bg:#e9e9e9;
+      --badge-neutral-color:#595959;
+      --badge-neutral-border:#d4d4d4;
+
+      --badge-positive-bg:#e6ffe6;
+      --badge-positive-color:#16a34a;
+      --badge-positive-border:#a8e6a8;
+
+      --badge-negative-bg:#ffe6e6;
+      --badge-negative-color:#e6162d;
+      --badge-negative-border:#ffb3b3;
+
+      /* 针对图2的AI提示颜色调整 */
+      --badge-ai-bg:#ebf3ff; /* 更浅的蓝色背景，接近图2 */
+      --badge-ai-color:#657991; /* 偏灰的蓝色文本颜色，接近图2 */
+      --badge-ai-border:#dde8f7; /* 浅灰色蓝色边框，接近图2 */
+
+      --weibo-red:#e6162d;
+    }
+
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif,"PingFang SC","Microsoft YaHei";
+      background-color:var(--bg-color);
+      color:var(--text-color);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    a{ text-decoration:none; color:var(--primary-color); }
+
+    /* Top Bar */
+    .topbar{
+      background-color:var(--panel-bg);
+      border-bottom:1px solid var(--border-color);
+      padding:10px 0;
+      position:sticky; top:0; z-index:1000;
+      box-shadow:var(--shadow-light);
+    }
+    .topbar-content{
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 15px;
+      flex-wrap: wrap;
+    }
+    .topbar-left{
+        display:flex; align-items:center;
+        gap:15px; /* 调整间距 */
+    }
+    .weibo-logo{
+        font-weight:bold;
+        font-size:20px;
+        color:var(--weibo-red);
+        display:flex;
+        align-items:center;
+    }
+    .weibo-logo img {
+        height: 24px; /* 微博图标大小 */
+        margin-right: 5px;
+    }
+    .search-box{
+      position:relative;
+      width:250px;
+      flex-shrink: 0;
+    }
+    .search-box input{
+      width:100%;
+      padding:8px 12px 8px 35px;
+      border:1px solid var(--border-color);
+      border-radius:999px;
+      background-color:var(--secondary-color);
+      font-size:13px;
+      outline:none;
+    }
+    .search-box .icon{
+      position:absolute; left:12px; top:50%;
+      transform:translateY(-50%);
+      color:var(--muted-text-color);
+    }
+
+    /* 右侧导航栏图标样式 */
+    .topbar-right{
+        display:flex;
+        align-items:center;
+        gap:20px; /* 图标间距 */
+    }
+    .topbar-right .icon-link{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:30px; /* 图标区域大小 */
+        height:30px;
+        font-size:20px; /* 图标大小 */
+        color:var(--muted-text-color);
+        position:relative;
+        cursor:pointer;
+    }
+    .topbar-right .icon-link.active .icon-badge{
+        background-color: var(--weibo-red);
+        color: white;
+        border-radius: 999px;
+        padding: 2px 6px;
+        font-size: 10px;
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        font-style: normal;
+    }
+    .topbar-right .icon-link:hover{
+        color:var(--primary-color);
+    }
+
+    .topbar-right .user-avatar-top{
+        width:35px; height:35px; border-radius:50%;
+        object-fit:cover; overflow:hidden; cursor:pointer;
+        margin-left: 10px; /* 与图标组的间距 */
+    }
+    .topbar-right .user-avatar-top img{
+        width:100%; height:100%; object-fit:cover; border-radius:50%;
+    }
+
+    /* 右侧功能按钮组 */
+    .topbar-right .func-buttons{
+        display:flex;
+        align-items:center;
+        gap:10px; /* 按钮间距 */
+        margin-left: 20px; /* 与头像的间距 */
+    }
+    .topbar-right .func-button{
+        width:30px; height:30px;
+        border-radius:50%;
+        background-color:var(--secondary-color);
+        display:flex; align-items:center; justify-content:center;
+        font-size:18px;
+        color:var(--muted-text-color);
+        cursor:pointer;
+    }
+    .topbar-right .func-button:hover{
+        background-color:#e0e0e0;
+    }
+    /* 发微博按钮特殊样式 */
+    .topbar-right .post-weibo-btn{
+        background-color:var(--primary-color);
+        color:white;
+        border-radius: 999px;
+        padding: 5px 15px;
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+    .topbar-right .post-weibo-btn:hover{
+        background-color:#e67100;
+    }
+
+
+    @media (max-width:768px){
+      .topbar-content{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .topbar-left, .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .search-box{
+        width: 100%;
+        order: 1;
+        margin-top: 10px;
+      }
+      .topbar-right {
+          order: 2;
+          margin-top: 5px;
+      }
+      .topbar-right .top-nav-item {
+          flex-grow: 1;
+          text-align: center;
+          margin: 0 2px;
+      }
+       .topbar-right .settings {
+          display: none;
+      }
+    }
+
+    /* Main Layout */
+    .main-layout{
+      max-width:1200px; margin:15px auto;
+      display:grid;
+      grid-template-columns:200px 1fr 280px;
+      gap:15px;
+      align-items:start;
+    }
+    @media (max-width:1024px){
+      .main-layout{ grid-template-columns:1fr 280px; }
+      .sidebar-left{ display:none; }
+    }
+    @media (max-width:768px){
+      .main-layout{ grid-template-columns:1fr; }
+      .sidebar-right{ display:none; }
+    }
+
+    /* Left Sidebar */
+    .sidebar-left{
+      background-color:var(--panel-bg);
+      border-radius:var(--border-radius-lg);
+      padding:15px 0;
+      box-shadow:var(--shadow-light);
+    }
+    .sidebar-left .menu-section{ margin-bottom:15px; }
+    .sidebar-left .menu-title{
+      font-size:13px;
+      color:var(--muted-text-color);
+      padding:8px 15px;
+    }
+    .sidebar-left .menu-item{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 15px;
+      cursor:pointer;
+      color:var(--text-color);
+      border-left:3px solid transparent;
+    }
+    .sidebar-left .menu-item:hover{ background-color:var(--secondary-color); }
+    .sidebar-left .menu-item.active{
+      background-color:var(--secondary-color);
+      color:var(--primary-color);
+      border-left-color:var(--primary-color);
+      font-weight:bold;
+    }
+    .sidebar-left .menu-item .icon{ font-size:16px; }
+
+    /* Main Content */
+    .main-content{
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+    }
+
+    /* Post Composer */
+    .post-composer{
+      background-color:var(--panel-bg);
+      border-radius:var(--border-radius-lg);
+      padding:15px;
+      box-shadow:var(--shadow-light);
+    }
+
+    /* 文本框区域 */
+    .composer-main-input{
+      display:flex;
+      flex-direction:column; /* 文本框和下面的元素垂直排列 */
+      gap:0; /* 移除内部元素的默认间距 */
+      align-items:flex-start; /* 文本框靠左对齐 */
+      border-top:1px solid var(--border-color);
+      border-bottom:1px solid var(--border-color);
+      margin:10px 0;
+      padding-top:10px;
+      padding-bottom:10px;
+      position:relative; /* 为内部绝对定位元素提供上下文 */
+    }
+
+    /* 编辑器区域 */
+    .composer-editor{ flex-grow:1; position:relative; min-height:80px; width:100%; } /* 确保宽度100% */
+
+    .composer-textarea{
+      width:100%; /* 占据父容器的全部宽度 */
+      min-height:80px;
+      padding:0;
+      border:none;
+      resize:none; /* 禁止用户改变大小，保持美观 */
+      font-size:14px;
+      line-height:1.6;
+      outline:none;
+      background-color:transparent;
+      vertical-align: top;
+      box-sizing: border-box;
+      color:var(--text-color);
+      padding-top: 5px; /* 调整 placeholder 的垂直位置 */
+      padding-right: 160px; /* 为字数和声明留出更多空间 */
+    }
+    .composer-textarea::placeholder{
+        color:var(--muted-text-color);
+        position: absolute;
+        top: 10px;
+        left: 0;
+        pointer-events: none;
+        width: calc(100% - 160px);
+    }
+
+    /* 文本框内的右下角元素 */
+    .composer-bottom-right{
+      position:absolute;
+      right:0; bottom:5px;
+      display:flex; align-items:center; /* 水平居中对齐 */
+      gap:8px; /* 字数和内容声明之间的间距 */
+      color:var(--muted-text-color);
+      font-size:12px;
+      pointer-events:auto;
+      z-index:1;
+    }
+
+    /* 字数统计样式 */
+    .composer-count-tip{
+      white-space:nowrap;
+      padding:2px 5px;
+      border-radius:var(--border-radius-sm);
+      color: var(--muted-text-color);
+      font-size:12px;
+    }
+    .composer-count-tip.hidden {
+        display: none;
+    }
+
+
+    /* 自定义下拉菜单（内容声明） */
+    .custom-select-wrapper{ position:relative; }
+    .custom-select-button{
+      border:1px solid var(--border-color);
+      border-radius:999px;
+      padding:2px 8px;
+      background-color:var(--panel-bg);
+      font-size:12px;
+      cursor:pointer;
+      color:var(--muted-text-color);
+      display:flex; align-items:center; gap:4px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .custom-select-button:hover{ border-color:var(--primary-color); }
+
+    .custom-select-dropdown{
+      display:none;
+      position:absolute;
+      background-color:var(--panel-bg);
+      min-width:150px;
+      box-shadow:var(--shadow-light);
+      border-radius:var(--border-radius-md);
+      z-index:100;
+      top:100%;
+      right:0; left:auto;
+      margin-top:5px;
+      border:1px solid var(--border-color);
+      overflow:hidden;
+    }
+    .custom-select-dropdown.show{ display:block; }
+
+    .custom-select-dropdown .item{
+      color:var(--text-color);
+      padding:8px 12px;
+      display:block;
+      cursor:pointer;
+    }
+    .custom-select-dropdown .item:hover{ background-color:var(--secondary-color); }
+    .custom-select-dropdown .item.selected{
+      background-color:var(--secondary-color);
+      color:var(--primary-color);
+      font-weight:bold;
+    }
+
+    /* 底部操作区（表情、图片、公开、发送） */
+    .composer-controls-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:15px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .composer-media-options{ display:flex; gap:15px; align-items:center; }
+    .composer-media-options .action-icon{
+      cursor:pointer;
+      color:var(--muted-text-color);
+      font-size:18px;
+    }
+    .composer-media-options .action-icon:hover{ color:var(--primary-color); }
+
+    .composer-send-row{ display:flex; gap:10px; align-items:center; }
+    /* 公开下拉在发送按钮左边 */
+    .composer-send-row .custom-select-wrapper{ margin-right:5px; }
+
+    .composer-send-buttons .btn{
+      padding:8px 18px;
+      border-radius:999px;
+      font-weight:bold;
+      cursor:pointer;
+      font-size:14px;
+      transition:background-color .2s ease;
+      border:none;
+    }
+    .composer-send-buttons .btn-send{ background-color:var(--weibo-red); color:white; }
+    .composer-send-buttons .btn-send:disabled{ background-color:#cccccc; cursor:not-allowed; }
+
+    /* AI提示样式 */
+    .ai-warning-badge{
+      display:inline-flex; /* 使用inline-flex让其像徽章一样融入文本流 */
+      align-items:center;
+      gap:4px; /* 调整图标与文字间距 */
+      background-color:var(--badge-ai-bg);
+      color:var(--badge-ai-color);
+      border:1px solid var(--badge-ai-border);
+      padding:4px 8px; /* 调整内边距，更紧凑 */
+      border-radius:12px; /* 更大的圆角，接近药丸形状 */
+      font-size:12px; /* 字体大小更小 */
+      font-weight:normal; /* 字体不要太粗 */
+      margin-top:8px;
+      margin-bottom:10px;
+      width:fit-content; /* 根据内容自适应宽度 */
+    }
+    .ai-warning-badge .icon{
+      font-size:14px; /* 调整图标大小 */
+      line-height:1; /* 确保图标垂直居中 */
+      vertical-align: middle; /* 确保图标与文本对齐 */
+      margin-right: 2px; /* 增加图标与文字的间距 */
+      /* 调整喇叭图标的颜色，使其更柔和 */
+      color: var(--badge-ai-color);
+    }
+
+
+    /* 新增的下方导航栏样式 */
+    .bottom-nav-filter{
+        display:flex;
+        gap:15px;
+        background-color:var(--panel-bg);
+        padding:10px 15px;
+        border-radius:var(--border-radius-lg);
+        box-shadow:var(--shadow-light);
+        margin-bottom:15px;
+        flex-wrap:wrap;
+        justify-content:space-between;
+        align-items:center;
+    }
+    .bottom-nav-filter .filter-options{
+        display:flex;
+        gap:15px;
+        flex-wrap:wrap;
+    }
+    .bottom-nav-filter .filter-options span{
+        padding:5px 10px;
+        border-radius:var(--border-radius-sm);
+        cursor:pointer;
+        color:var(--text-color);
+        font-size:13px;
+        white-space:nowrap;
+    }
+    .bottom-nav-filter .filter-options span.active{
+        color:var(--primary-color);
+        font-weight:bold;
+    }
+     /* 高级搜索的样式 */
+    .bottom-nav-filter .advanced-search-wrapper {
+        position: relative;
+    }
+    .bottom-nav-filter .advanced-search-button {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        background-color: var(--panel-bg);
+        font-size: 13px;
+        color: var(--muted-text-color);
+        cursor: pointer;
+    }
+    .bottom-nav-filter .advanced-search-button:hover {
+        border-color: var(--primary-color);
+    }
+
+    .posts-container{ display:flex; flex-direction:column; gap:15px; }
+
+    /* Generic Post Card */
+    .post-card{
+      background-color:var(--panel-bg);
+      border-radius:var(--border-radius-lg);
+      padding:15px;
+      box-shadow:var(--shadow-light);
+    }
+
+    .post-header{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+
+    /* Generic Post Avatar (for generated posts) */
+    .post-avatar{
+      width:45px; height:45px; border-radius:50%;
+      object-fit:cover; flex-shrink:0;
+    }
+    .post-avatar img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
+
+    .post-info{ flex-grow:1; min-width:0; }
+
+    .post-author-line{
+      font-weight:bold;
+      color:var(--text-color);
+      font-size:15px;
+      display:flex; align-items:center;
+      flex-wrap:wrap;
+      gap:5px;
+    }
+
+    .post-meta-line{
+      font-size:12px;
+      color:var(--muted-text-color);
+      margin-top:2px;
+      display:flex; align-items:center;
+      flex-wrap:wrap;
+      gap:5px;
+    }
+
+    .vplus-badge{
+      display:inline-block;
+      background-color:var(--weibo-red);
+      color:white;
+      padding:0 4px;
+      border-radius:var(--border-radius-sm);
+      font-size:11px;
+      font-weight:bold;
+    }
+    .declare-badge{
+      display:inline-block;
+      padding:2px 6px;
+      border-radius:var(--border-radius-sm);
+      font-size:11px;
+      font-weight:bold;
+      border:1px solid;
+      white-space:nowrap;
+    }
+    .declare-badge.neutral{ background-color:var(--badge-neutral-bg); color:var(--badge-neutral-color); border-color:var(--badge-neutral-border); }
+    .declare-badge.original{ background-color:var(--badge-positive-bg); color:var(--badge-positive-color); border-color:var(--badge-positive-border); }
+    .declare-badge.repost{ background-color:var(--badge-neutral-bg); color:var(--badge-neutral-color); border-color:var(--badge-neutral-border); }
+    .declare-badge.ai{ background-color:var(--badge-ai-bg); color:var(--badge-ai-color); border-color:var(--badge-ai-border); }
+    .declare-badge.fiction{ background-color:var(--badge-negative-bg); color:var(--badge-negative-color); border-color:var(--badge-negative-border); }
+
+    .post-content{
+      margin-bottom:10px;
+      line-height:1.6;
+      white-space:pre-wrap;
+    }
+
+    .post-image{
+      width:100%;
+      border-radius:var(--border-radius-md);
+      margin-top:10px;
+      max-width:400px;
+      display:block;
+    }
+
+    .post-actions-row{
+      display:flex; justify-content:space-around;
+      border-top:1px solid var(--border-color);
+      padding-top:10px;
+      margin-top:10px;
+    }
+
+    .post-action-btn{
+      display:flex; align-items:center; gap:5px;
+      color:var(--muted-text-color);
+      cursor:pointer;
+      font-size:13px;
+    }
+    .post-action-btn:hover{ color:var(--primary-color); }
+
+    /*人民日报特殊卡片样式*/
+    .rmrb-post-card{
+        padding:0;
+        border-radius:var(--border-radius-lg);
+        overflow:hidden;
+    }
+    .rmrb-post-card .rmrb-header-content{
+        padding:15px 15px 0 15px;
+        background-color:var(--panel-bg);
+        position:relative;
+        z-index:2;
+        border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+    .rmrb-post-card .rmrb-avatar-line{
+        display:flex; align-items:center; gap:10px; margin-bottom:10px;
+    }
+    /* People's Daily Avatar (specific to their card) */
+    .rmrb-post-card .rmrb-avatar{
+        width:45px; height:45px; border-radius:50%;
+        object-fit:cover; flex-shrink:0;
+    }
+    .rmrb-post-card .rmrb-avatar img{
+      width:100%; height:100%; object-fit:cover; border-radius:50%;
+    }
+
+    .rmrb-post-card .rmrb-author-info{ flex-grow:1; min-width:0; }
+    .rmrb-post-card .rmrb-author-name{
+        font-weight:bold; font-size:15px; color:var(--text-color);
+        display:flex; align-items:center; gap:5px;
+    }
+    .rmrb-post-card .rmrb-meta-info{
+        font-size:12px; color:var(--muted-text-color); margin-top:2px;
+    }
+    .rmrb-post-card .rmrb-text-content{
+        line-height:1.6; white-space:pre-wrap; margin-bottom:10px; color:#333;
+    }
+
+    .rmrb-card-link-wrapper{
+        display:block;
+        background-color:#f7f9fc;
+        border-top:1px solid var(--border-color);
+        padding:10px 15px;
+        text-decoration:none;
+        color:var(--text-color);
+    }
+    .rmrb-card-link-inner{
+        display:flex; align-items:center; gap:10px;
+    }
+    .rmrb-card-link-inner img{
+        width:60px; height:60px; border-radius:var(--border-radius-sm);
+        object-fit:cover; flex-shrink:0;
+    }
+    .rmrb-card-link-inner .link-text{
+        font-weight:bold; line-height:1.3; font-size:14px; color:#333;
+    }
+    .rmrb-post-card .post-actions-row{
+        margin-top:0;
+        border-top:1px solid var(--border-color);
+        padding-top:10px; padding-bottom:10px;
+        background-color:var(--panel-bg);
+        border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+    }
+    .rmrb-post-card .post-actions-row .post-action-btn{
+        flex-grow:1; justify-content:center;
+        border-right:1px solid var(--border-color);
+    }
+    .rmrb-post-card .post-actions-row .post-action-btn:last-child{ border-right:none; }
+
+    /* Right Sidebar */
+    .sidebar-right{
+      background-color:var(--panel-bg);
+      border-radius:var(--border-radius-lg);
+      padding:15px;
+      box-shadow:var(--shadow-light);
+    }
+
+    .sidebar-right .section-title{
+      font-weight:bold; font-size:15px;
+      margin-bottom:15px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+
+    .hot-search-list .item{
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:10px; font-size:13px;
+    }
+
+    .hot-search-list .item .rank{
+      font-weight:bold;
+      width:20px;
+      text-align:right;
+    }
+    .hot-search-list .item .rank.top3{ color:var(--weibo-red); }
+
+    .hot-search-list .item .title{
+      flex-grow:1;
+      color:var(--text-color);
+    }
+    .hot-search-list .item .title a{
+        color:var(--text-color);
+    }
+    .hot-search-list .item .title a:hover{
+        color:var(--primary-color);
+    }
+
+    .hot-search-list .item .hot-value{
+      color:var(--muted-text-color);
+    }
+    .hot-search-list .item .new-icon{
+      background-color:var(--weibo-red);
+      color:white;
+      padding:1px 4px;
+      border-radius:var(--border-radius-sm);
+      font-size:10px;
+      font-weight:bold;
+    }
+
+    .hot-search-list .more{
+      text-align:center;
+      margin-top:15px;
+    }
+    .hot-search-list .more a{
+        color:var(--muted-text-color);
+    }
+    .hot-search-list .more a:hover{
+        color:var(--primary-color);
+    }
+
+    .interest-list .item{
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:10px; font-size:13px;
+    }
+    /* Placeholder for interest list avatar */
+    .interest-list .item .avatar{
+      width:30px; height:30px; border-radius:50%;
+      object-fit:cover;
+    }
+    .interest-list .item .avatar img{
+      width:100%; height:100%; object-fit:cover; border-radius:50%;
+    }
+
+    .interest-list .item .name{
+      font-weight:bold;
+      color:var(--text-color);
+    }
+    .interest-list .item .follow-btn{
+      background-color:var(--primary-color);
+      color:white;
+      border:none;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      margin-left:auto; /* Push to right */
+    }
+
+    /* Toast for success message */
+    .toast{
+      position:fixed;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background-color:rgba(0,0,0,.75);
+      color:white;
+      padding:15px 30px;
+      border-radius:var(--border-radius-lg);
+      font-size:16px;
+      font-weight:bold;
+      z-index:1001;
+      opacity:0;
+      transition:opacity .3s ease;
+      display:none; /* Hidden by default */
+    }
+
+    .toast.show{ opacity:1; display:block; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-content">
+      <div class="topbar-left">
+        <div class="weibo-logo">
+          <img src="./微博头像.png" alt="微博Logo" />
+          <span>微博</span>
+        </div>
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" placeholder="搜索微博" />
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a href="#" class="icon-link">
+            <span class="icon">🏠</span>
+        </a>
+        <a href="#" class="icon-link active">
+            <span class="icon">🔥</span>
+            <i class="icon-badge">NEW</i>
+        </a>
+        <a href="#" class="icon-link">
+            <span class="icon">☐</span>
+        </a>
+        <a href="#" class="icon-link active">
+            <span class="icon">✉️</span>
+            <i class="icon-badge">9+</i>
+        </a>
+        <div class="user-avatar-top">
+          <img src="./用户.jpg" alt="用户头像" />
+        </div>
+        <div class="func-buttons">
+            <div class="func-button">⚙️</div>
+            <div class="func-button">🌙</div>
+        </div>
+        <div class="post-weibo-btn">发微博</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Left Sidebar -->
+    <div class="sidebar-left">
+      <div class="menu-section">
+        <div class="menu-item active">
+          <span class="icon">📑</span>
+          <span>全部关注</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">✨</span>
+          <span>最新微博</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">⭐</span>
+          <span>特别关注</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">👥</span>
+          <span>好友圈</span>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-title">自定义分组</div>
+        <div class="menu-item">
+          <span class="icon">🌟</span>
+          <span>名人明星</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">🤝</span>
+          <span>同事</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">👨‍🎓</span>
+          <span>同学</span>
+        </div>
+        <div class="menu-item">
+          <span class="icon">💑</span>
+          <span>情侣关注</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Post Composer -->
+      <div class="post-composer">
+        <!-- 文本框区 -->
+        <div class="composer-main-input">
+          <!-- 文本框（只用底层 placeholder，不额外显示顶部文案） -->
+          <textarea
+            id="composerTextarea"
+            class="composer-textarea"
+            placeholder="有什么新鲜事想分享给大家？"></textarea>
+
+          <!-- 文本框右下角：字数 和 内容声明 -->
+          <div class="composer-bottom-right">
+            <div class="composer-count-tip hidden" title="字数">
+              字数：<span id="charCount">0</span>
+            </div>
+
+            <div class="custom-select-wrapper">
+              <div class="custom-select-button" id="claimDropdownBtn" title="内容声明">
+                <span id="claimSelectedValue">内容声明</span>
+                <span>▼</span>
+              </div>
+
+              <div class="custom-select-dropdown" id="claimDropdownContent">
+                <div class="item selected" data-value="无">无</div>
+                <div class="item" data-value="内容为自主创作">内容为自主创作</div>
+                <div class="item" data-value="内容为转载">内容为转载</div>
+                <div class="item" data-value="内容由AI生成">内容由AI生成</div>
+                <div class="item" data-value="内容为虚构演绎">内容为虚构演绎</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部按钮区：表情、图片、公开、发送 -->
+        <div class="composer-controls-row">
+          <div class="composer-media-options">
+            <span class="action-icon">😀</span>
+            <span class="action-icon">🖼️</span>
+            <span class="action-icon">🎞️</span>
+            <span class="action-icon">#</span>
+            <span class="action-icon">📰</span>
+            <span class="action-icon">...</span>
+          </div>
+
+          <div class="composer-send-row">
+            <!-- 公开：在“发送”按钮左边 -->
+            <div class="custom-select-wrapper">
+              <div class="custom-select-button" id="publicDropdownBtn" title="公开范围">
+                <span id="publicSelectedValue">公开</span>
+                <span>▼</span>
+              </div>
+
+              <div class="custom-select-dropdown" id="publicDropdownContent">
+                <div class="item selected" data-value="公开">公开</div>
+                <div class="item" data-value="粉丝可见">粉丝可见</div>
+                <div class="item" data-value="好友圈">好友圈</div>
+                <div class="item" data-value="仅自己可见">仅自己可见</div>
+                <div class="item" data-value="群可见">群可见</div>
+              </div>
+            </div>
+
+            <div class="composer-send-buttons">
+              <button id="sendPostBtn" class="btn btn-send" disabled>发送</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed Filter -->
+      <div class="bottom-nav-filter">
+        <div class="filter-options">
+          <span class="active">全部</span>
+          <span>原创</span>
+          <span>视频</span>
+          <span>超话社区</span>
+          <span>V+微博</span>
+          <span>群微博</span>
+        </div>
+        <div class="advanced-search-wrapper">
+            <div class="advanced-search-button">
+                <span>高级搜索</span>
+                <span>▼</span>
+            </div>
+            <!-- 高级搜索的下拉菜单（如果需要） -->
+        </div>
+      </div>
+
+      <!-- Posts Feed Container -->
+      <div id="postsFeed" class="posts-container">
+        <!-- 人民日报 Initial post -->
+        <div class="post-card rmrb-post-card">
+          <div class="rmrb-header-content">
+            <div class="rmrb-avatar-line">
+              <div class="rmrb-avatar">
+                <img src="./人民日报日报.jpg" alt="人民日报头像" />
+              </div>
+              <div class="rmrb-author-info">
+                <div class="rmrb-author-name">
+                  人民日报 <span class="vplus-badge">V+</span>
+                </div>
+                <div class="rmrb-meta-info">
+                  12小时前 来自 微博weibo.com
+                </div>
+              </div>
+            </div>
+            <div class="rmrb-text-content">
+              【夜读：#5个方法让周末不再“无效休息”#】①允许自己不焦虑地休息；②用心地做一顿早餐；③简单出门走一走；④整理一个角落；⑤允许放空自己。周末要到了，好好放松，为新的一周积蓄力量。#人民日报夜读#
+            </div>
+          </div>
+
+          <a href="#" class="rmrb-card-link-wrapper">
+            <div class="rmrb-card-link-inner">
+              <img src="./插图.jpg" alt="人民日报插图" />
+              <div class="link-text">【夜读】5个方法让周末不再“无效休息”</div>
+            </div>
+          </a>
+
+          <div class="post-actions-row">
+            <span class="post-action-btn">转发 718</span>
+            <span class="post-action-btn">评论 1591</span>
+            <span class="post-action-btn">点赞 2030</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-right">
+      <div class="section-title">
+        <span>微博热搜</span>
+        <a href="#">刷新</a>
+      </div>
+      <div class="hot-search-list">
+        <div class="item"><span class="rank top3">1</span><span class="title"><a href="#">#高考倒计时30天#</a></span><span class="hot-value">386616</span></div>
+        <div class="item"><span class="rank top3">2</span><span class="title"><a href="#">#夏季时尚穿搭指南#</a></span><span class="hot-value">264419</span></div>
+        <div class="item"><span class="rank top3">3</span><span class="title"><a href="#">#电影票房再创新高#</a></span><span class="hot-value">1103503</span></div>
+        <div class="item"><span class="rank">4</span><span class="title"><a href="#">#职场新人求生法则#</a></span><span class="hot-value">851204</span></div>
+        <div class="item"><span class="rank">5</span><span class="title"><a href="#">#PAPI酱谈育儿理念#</a></span><span class="hot-value">747459</span><span class="new-icon">新</span></div>
+        <div class="item"><span class="rank">6</span><span class="title"><a href="#">#AI绘画版权之争#</a></span><span class="hot-value">623145</span></div>
+        <div class="item"><span class="rank">7</span><span class="title"><a href="#">#全球经济面临的挑战#</a></span><span class="hot-value">512345</span></div>
+        <div class="item"><span class="rank">8</span><span class="title"><a href="#">#明星新剧开播#</a></span><span class="hot-value">487654</span></div>
+        <div class="item"><span class="rank">9</span><span class="title"><a href="#">#世界杯预选赛战报#</a></span><span class="hot-value">412345</span></div>
+        <div class="item"><span class="rank">10</span><span class="title"><a href="#">#科技改变生活#</a></span><span class="hot-value">398765</span></div>
+        <div class="more"><a href="#">查看完整热搜榜单 ></a></div>
+      </div>
+
+      <div class="section-title" style="margin-top: 25px;">你可能感兴趣的人</div>
+      <div class="interest-list">
+        <div class="item">
+          <div class="avatar">
+            <img src="./可能感兴趣的人1头像.png" alt="招财小猫头像" />
+          </div>
+          <span class="name">招财小猫</span>
+          <button class="follow-btn">+关注</button>
+        </div>
+        <div class="item">
+          <div class="avatar">
+            <img src="./可能感兴趣的人2头像.png" alt="酷玩少女头像" />
+          </div>
+          <span class="name">酷玩少女</span>
+          <button class="follow-btn">+关注</button>
+        </div>
+        <div class="item">
+          <div class="avatar">
+            <img src="./可能感兴趣的人3头像.png" alt="央视新闻头像" />
+          </div>
+          <span class="name">央视新闻</span>
+          <button class="follow-btn">+关注</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast for success message -->
+  <div id="successToast" class="toast">发布成功</div>
+
+  <script>
+    // Constants
+    const USER_AVATAR_URL = './用户.jpg';
+    const RMRB_AVATAR_URL = './人民日报日报.jpg';
+    const RMRB_IMAGE_URL = './插图.jpg';
+
+    // UI Elements
+    const composerTextarea = document.getElementById('composerTextarea');
+    const sendPostBtn = document.getElementById('sendPostBtn');
+    const postsFeed = document.getElementById('postsFeed');
+    const successToast = document.getElementById('successToast');
+
+    const publicDropdownBtn = document.getElementById('publicDropdownBtn');
+    const publicDropdownContent = document.getElementById('publicDropdownContent');
+    const publicSelectedValue = document.getElementById('publicSelectedValue');
+
+    const claimDropdownBtn = document.getElementById('claimDropdownBtn');
+    const claimDropdownContent = document.getElementById('claimDropdownContent');
+    const claimSelectedValue = document.getElementById('claimSelectedValue'); // 按钮上显示的值
+
+    const charCountEl = document.getElementById('charCount');
+    const charCountTip = document.querySelector('.composer-count-tip'); // 获取字数统计容器
+
+    let currentPublicSelection = '公开';
+    let currentClaimSelection = '无'; // 默认为“无”
+
+    // --- Helper Functions ---
+    function updateCharCountAndSendState() {
+      const text = composerTextarea.value;
+      charCountEl.textContent = String(text.length);
+      sendPostBtn.disabled = text.length === 0;
+
+      // 根据文本内容显示或隐藏字数统计
+      if (text.length > 0) {
+        charCountTip.classList.remove('hidden');
+      } else {
+        charCountTip.classList.add('hidden');
+      }
+    }
+
+    function showToast(message, duration = 1000) {
+      successToast.textContent = message;
+      successToast.classList.add('show');
+      return new Promise(resolve => {
+        setTimeout(() => {
+          successToast.classList.remove('show');
+          resolve();
+        }, duration);
+      });
+    }
+
+    function getDeclareBadgeClass(claimValue) {
+      switch (claimValue) {
+        case '无': return 'neutral';
+        case '内容为自主创作': return 'original';
+        case '内容为转载': return 'repost';
+        case '内容由AI生成': return 'ai';
+        case '内容为虚构演绎': return 'fiction';
+        default: return 'neutral';
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str ?? '').replace(/[&<>"']/g, (m) => {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return map[m] || m;
+      });
+    }
+
+    function generateUserPostCard(postData) {
+      const postCard = document.createElement('div');
+      postCard.classList.add('post-card');
+
+      // AI提示的HTML，现在是固定显示，不进行任何条件判断
+      // 图标恢复为喇叭，并调整颜色
+      const aiWarningHtml = `
+        <div class="ai-warning-badge">
+          <span class="icon">🔊</span> <!-- 恢复喇叭图标 -->
+          该内容疑似由AI生成,请注意甄别
+        </div>
+      `;
+
+      // 内容声明徽章的HTML
+      let claimBadgeHtml = '';
+      // 如果内容声明不是“无”且不是“内容由AI生成”（因为AI提示已经固定显示了），才显示内容声明徽章
+      if (postData.claim && postData.claim !== '无' && postData.claim !== '内容由AI生成') {
+        claimBadgeHtml = `
+          <span class="declare-badge ${getDeclareBadgeClass(postData.claim)}">${postData.claim}</span>
+        `;
+      }
+
+
+      postCard.innerHTML = `
+        <div class="post-header">
+          <div class="post-avatar">
+            <img src="${USER_AVATAR_URL}" alt="用户头像" />
+          </div>
+          <div class="post-info">
+            <div class="post-author-line">
+              我的账号
+              ${postData.publicScope !== '公开' ? `<span class="declare-badge neutral">${postData.publicScope}</span>` : ''}
+              ${claimBadgeHtml}
+            </div>
+            <div class="post-meta-line">
+              刚刚 来自微博网页版
+            </div>
+          </div>
+        </div>
+        ${aiWarningHtml} <!-- 这里插入AI提示，现在是固定显示 -->
+        <div class="post-content">${escapeHtml(postData.content)}</div>
+        <div class="post-actions-row">
+          <span class="post-action-btn">转发 0</span>
+          <span class="post-action-btn">评论 0</span>
+          <span class="post-action-btn">点赞 0</span>
+        </div>
+      `;
+      return postCard;
+    }
+
+    // --- Dropdown Logic ---
+    function setupDropdown(button, content, selectedValueSpan, setCurrentFn, isClaimDropdown = false) {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        // Close the other dropdown if open
+        if (button.id === 'publicDropdownBtn') {
+          claimDropdownContent.classList.remove('show');
+        } else {
+          publicDropdownContent.classList.remove('show');
+        }
+        content.classList.toggle('show');
+      });
+
+      content.querySelectorAll('.item').forEach(item => {
+        item.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const value = item.dataset.value;
+
+          // 更新按钮显示文本
+          selectedValueSpan.textContent = value;
+          // 更新内部选择状态
+          setCurrentFn(value);
+
+          // 移除所有选中的样式，再添加给当前项
+          content.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+
+          content.classList.remove('show'); // 关闭下拉菜单
+        });
+      });
+    }
+
+    // Initialize Public dropdown
+    setupDropdown(
+      publicDropdownBtn,
+      publicDropdownContent,
+      publicSelectedValue,
+      (value) => currentPublicSelection = value
+    );
+
+    // Initialize Claim dropdown
+    setupDropdown(
+      claimDropdownBtn,
+      claimDropdownContent,
+      claimSelectedValue,
+      (value) => currentClaimSelection = value,
+      true // This is the claim dropdown
+    );
+
+    // Initial state for claim dropdown button text and selected item
+    claimSelectedValue.textContent = '内容声明'; // 按钮默认显示“内容声明”
+    // 确保默认内部选中项是“无”
+    claimDropdownContent.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+    const defaultClaimItem = claimDropdownContent.querySelector('.item[data-value="无"]');
+    if (defaultClaimItem) {
+      defaultClaimItem.classList.add('selected');
+      currentClaimSelection = '无'; // 内部状态也设置为“无”
+    }
+
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+      publicDropdownContent.classList.remove('show');
+      claimDropdownContent.classList.remove('show');
+    });
+
+    // --- Event Listeners ---
+    composerTextarea.addEventListener('input', updateCharCountAndSendState);
+
+    sendPostBtn.addEventListener('click', async () => {
+      const content = composerTextarea.value.trim();
+      if (!content) {
+        alert('内容不能为空！');
+        return;
+      }
+
+      await showToast('发布成功');
+
+      postsFeed.prepend(generateUserPostCard({
+        content: content,
+        publicScope: currentPublicSelection,
+        claim: currentClaimSelection // 将当前选择的声明传递给生成函数
+      }));
+
+      // Reset composer
+      composerTextarea.value = '';
+      // 重置公开范围
+      currentPublicSelection = '公开';
+      publicSelectedValue.textContent = '公开';
+      publicDropdownContent.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+      publicDropdownContent.querySelector('.item[data-value="公开"]').classList.add('selected');
+
+      // 重置内容声明为“内容声明”和内部“无”
+      currentClaimSelection = '无';
+      claimSelectedValue.textContent = '内容声明';
+      claimDropdownContent.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+      const resetClaimItem = claimDropdownContent.querySelector('.item[data-value="无"]');
+      if(resetClaimItem) {
+        resetClaimItem.classList.add('selected');
+      }
+
+      updateCharCountAndSendState(); // 更新字数显示状态
+    });
+
+    // Initial setup
+    updateCharCountAndSendState();
+  </script>
+
+</body>
+</html>
